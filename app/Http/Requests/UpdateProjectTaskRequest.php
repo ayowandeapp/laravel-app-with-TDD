@@ -2,16 +2,20 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\TaskCompletion;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class UpdateProjectRequest extends FormRequest
+class UpdateProjectTaskRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return auth()->user()->is($this->project->owner);
+        // $projectTask = \App\Models\ProjectTask::find($this->projectTask);
+        // dd($this->projectTask->project);
+        return auth()->user()->is($this->projectTask->project->owner);
     }
 
     /**
@@ -22,9 +26,8 @@ class UpdateProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required',
-            'description' => 'required',
-            'notes' => 'nullable'
+            'body' => 'required',
+            'completed' => ['required', Rule::enum(TaskCompletion::class)]
         ];
     }
 }

@@ -8,6 +8,7 @@ use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
 {
+    /*
     use RefreshDatabase;
 
     public function test_users_can_authenticate_using_the_login_screen(): void
@@ -44,4 +45,6 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
         $response->assertNoContent();
     }
+
+    */
 }

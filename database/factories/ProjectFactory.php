@@ -20,6 +20,7 @@ class ProjectFactory extends Factory
         return [
             'title' => $this->faker->sentence,
             'description' => $this->faker->paragraph,
+            'notes' => $this->faker->realText,
             'owner_id' => User::factory()->create()
         ];
     }

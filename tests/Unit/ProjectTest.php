@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Models\Project;
+use App\Models\ProjectTask;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -24,5 +25,15 @@ class ProjectTest extends TestCase
 
         $this->assertInstanceOf(User::class, $project->owner);
 
+    }
+
+    public function test_can_add_a_task()
+    {
+        $project = Project::factory()->create();
+        $task = $project->tasks()->create(['body' => 'new task']);
+        $this->assertDatabaseHas(ProjectTask::class, ['project_id' => $project->id, 'body' => 'new task']);
+        // $this->assertDatabaseHas(ProjectTask::class, $task->toArray());
+        $this->assertTrue($project->tasks->contains($task));
+        $this->assertCount(1, $project->tasks);
     }
 }

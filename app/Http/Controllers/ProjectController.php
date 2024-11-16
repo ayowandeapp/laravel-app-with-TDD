@@ -15,7 +15,7 @@ class ProjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): Response
     {
         $projects = auth()->user()->projects;
         return response($projects, Response::HTTP_OK);
@@ -34,7 +34,7 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request): Response
     {
-        $attributes = $request->only(['title', 'description']);
+        $attributes = $request->validated();
 
         $project = auth()->user()->projects()->create($attributes);
 
@@ -65,7 +65,13 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        //
+        //using policy
+        if ($request->user()->cannot('update', $project)) {
+            abort(403);
+        }
+        $project->update($request->validated());
+
+        return response($project, Response::HTTP_OK);
     }
 
     /**

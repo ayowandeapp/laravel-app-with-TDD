@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Project;
 use App\Models\User;
+use Facades\Tests\Setup\ProjectFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,8 +16,6 @@ class ProjectsTest extends TestCase
 
     public function test_a_user_can_create_project(): void
     {
-        // $this->withoutExceptionHandling();
-
         $this->authenticate();
 
         $payload = Project::factory()->raw(['owner_id' => auth()->user()->id]);
@@ -28,6 +27,23 @@ class ProjectsTest extends TestCase
         $this->assertDatabaseHas('projects', $payload);
 
         $this->get('/api/projects')->assertSee($payload['title']);
+
+    }
+
+    public function test_a_user_can_update_a_project(): void
+    {
+        $project = ProjectFactory::create();
+
+        $payload = Project::factory()->raw(['owner_id' => $project->owner->id]);
+
+        $response = $this->actingAs($project->owner)->patch($project->path(), $payload);
+
+        $response->assertStatus(Response::HTTP_OK);
+
+        $this->assertDatabaseHas('projects', $payload);
+
+        $this->get('/api/projects')->assertSee($payload['title']);
+
     }
 
     public function test_guests_cannot_view_projects(): void
@@ -39,15 +55,12 @@ class ProjectsTest extends TestCase
 
         $response->assertStatus(Response::HTTP_FOUND);
     }
+
     public function test_a_user_can_view_a_project(): void
     {
-        $this->withoutExceptionHandling();
+        $project = ProjectFactory::create();
 
-        $this->authenticate();
-
-        $project = Project::factory()->create(['owner_id' => auth()->user()->id]);
-
-        $response = $this->get($project->path());
+        $response = $this->actingAs($project->owner)->get($project->path());
 
         // $response->assertStatus(Response::HTTP_OK);
 
@@ -57,7 +70,6 @@ class ProjectsTest extends TestCase
 
     public function test_a_title_is_required()
     {
-        // $this->withoutExceptionHandling();
         $this->authenticate();
 
         $payload = Project::factory()->raw(['title' => '']);
@@ -67,12 +79,10 @@ class ProjectsTest extends TestCase
         $response->assertSessionHasErrors(['title']);
 
         $response->assertStatus(Response::HTTP_FOUND);
-        // dd($payload);
 
     }
     public function test_a_description_is_required()
     {
-        // $this->withoutExceptionHandling();
         $this->authenticate();
 
         $payload = Project::factory()->raw(['description' => '']);
@@ -85,13 +95,9 @@ class ProjectsTest extends TestCase
     }
     public function test_guests_cannot_create_project()
     {
-        // $this->withoutExceptionHandling();
-
         $payload = Project::factory()->raw();
 
         $response = $this->post('/api/projects', $payload);
-        // dd($response);
-        // $response->assertSessionHasErrors(['unauthorized']);
 
         $response->assertStatus(Response::HTTP_FOUND);
 
@@ -100,6 +106,7 @@ class ProjectsTest extends TestCase
     public function test_auth_user_cannot_view_others_project()
     {
         $this->authenticate();
+
         $project = Project::factory()->create();
 
         $response = $this->get($project->path());
@@ -109,4 +116,16 @@ class ProjectsTest extends TestCase
 
     }
 
+    public function test_auth_user_cannot_update_others_project()
+    {
+        $this->authenticate();
+
+        $project = Project::factory()->create();
+
+        $response = $this->patch($project->path(), ['body' => $this->faker->sentence]);
+
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
+
+
+    }
 }
