@@ -46,7 +46,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        if (auth()->user()->id != $project->owner_id) {
+        if (auth()->user()->isNot($project->owner)) {
             return response('unAutorized', Response::HTTP_FORBIDDEN);
         }
         return response($project, Response::HTTP_OK);
@@ -66,9 +66,9 @@ class ProjectController extends Controller
     public function update(UpdateProjectRequest $request, Project $project)
     {
         //using policy
-        if ($request->user()->cannot('update', $project)) {
-            abort(403);
-        }
+        // if ($request->user()->cannot('update', $project)) {
+        //     abort(403);
+        // }
         $project->update($request->validated());
 
         return response($project, Response::HTTP_OK);

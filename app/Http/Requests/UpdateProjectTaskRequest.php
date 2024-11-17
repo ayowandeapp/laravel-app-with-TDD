@@ -26,8 +26,8 @@ class UpdateProjectTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'body' => 'required',
-            'completed' => ['required', Rule::enum(TaskCompletion::class)]
+            'body' => 'sometimes',
+            'completed' => ['sometimes', Rule::enum(TaskCompletion::class)]
         ];
     }
 }

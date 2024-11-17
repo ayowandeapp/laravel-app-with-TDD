@@ -3,18 +3,15 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
 
-class UpdateProjectRequest extends FormRequest
+class StoreActivityRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        //using policy
-        return Gate::allows('update', $this->project);
-        // return auth()->user()->is($this->project->owner);
+        return false;
     }
 
     /**
@@ -25,9 +22,7 @@ class UpdateProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'sometimes|required',
-            'description' => 'sometimes|required',
-            'notes' => 'min:5'
+            //
         ];
     }
 }

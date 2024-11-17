@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Symfony\Component\HttpFoundation\Response;
 use Facades\Tests\Setup\ProjectFactory;
 use Tests\TestCase;
+use function PHPUnit\Framework\assertEquals;
 
 class ProjectTasksTest extends TestCase
 {
@@ -42,13 +43,42 @@ class ProjectTasksTest extends TestCase
 
         $this->actingAs($project->owner)
             ->patch($project->tasks->first()->path(), [
+                'body' => 'changed body'
+            ])
+            ->assertStatus(Response::HTTP_OK)
+            ->assertSee('changed body');
+    }
+
+    public function test_a_tasks_can_be_completed()
+    {
+        $project = ProjectFactory::withTasks(1)->create();
+
+        $this->actingAs($project->owner)
+            ->patch($project->tasks->first()->path(), [
                 'body' => 'changed body',
                 'completed' => 1
             ])
             ->assertStatus(Response::HTTP_OK)
             ->assertSee('changed body');
+    }
+    public function test_a_tasks_can_be_incomplete()
+    {
+        $project = ProjectFactory::withTasks(1)->create();
 
-        // $this->get($project->path())->assertSee('New Tasks');
+        $this->actingAs($project->owner)
+            ->patch($project->tasks->first()->path(), [
+                'body' => 'changed body',
+                'completed' => 0
+            ]);
+
+        $this->actingAs($project->owner)
+            ->patch($project->tasks->first()->path(), [
+                'completed' => 1
+            ])
+            ->assertStatus(Response::HTTP_OK)
+            ->assertSee('changed body')
+        ;
+        $this->assertEquals(1, $project->refresh()->tasks->first()->completed);
     }
     public function test_only_project_owner_can_update_a_task()
     {
