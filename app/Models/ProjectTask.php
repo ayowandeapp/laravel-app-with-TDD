@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Observers\ProjectTaskObserver;
+use App\RecordsActivity;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class ProjectTask extends Model
 {
     /** @use HasFactory<\Database\Factories\ProjectTaskFactory> */
-    use HasFactory;
+    use HasFactory, RecordsActivity;
 
     protected $guarded = [];
 
@@ -35,12 +36,22 @@ class ProjectTask extends Model
         return $this->morphMany(Activity::class, 'subject');
     }
 
-    public function saveActivity($description)
-    {
-        $this->activity()->create([
-            'user_id' => ($this->project ?? $this)->owner->id,
-            'description' => $description,
-            'project_id' => $this->project->id
-        ]);
-    }
+    // public function saveActivity($description)
+    // {
+    //     $this->activity()->create([
+    //         'user_id' => ($this->project ?? $this)->owner->id,
+    //         'description' => $description,
+    //         'project_id' => $this->project->id
+    //     ]);
+    // }
+
+    // private function loadActivityChanges()
+    // {
+    //     if ($this->wasChanged()) {
+    //         return [
+    //             'before' => array_diff($this->old, $this->getAttributes()),
+    //             'after' => $this->getChanges()
+    //         ];
+    //     }
+    // }
 }

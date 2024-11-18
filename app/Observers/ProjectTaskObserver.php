@@ -11,18 +11,22 @@ class ProjectTaskObserver
      */
     public function created(ProjectTask $projectTask): void
     {
-        $projectTask->saveActivity('created_task');
+        // $projectTask->saveActivity('created_task');
     }
 
+    // public function updating(ProjectTask $ProjectTask): void
+    // {
+    //     $ProjectTask->old = $ProjectTask->getOriginal();
+    // }
     /**
      * Handle the ProjectTask "updated" event.
      */
     public function updated(ProjectTask $projectTask): void
     {
         // dd($projectTask);
-        if (!$projectTask->completed)
-            return;
-        $projectTask->saveActivity('completed_task');
+        // if (!$projectTask->completed)
+        //     return;
+        // $projectTask->saveActivity('completed_task');
     }
 
     /**
@@ -30,7 +34,7 @@ class ProjectTaskObserver
      */
     public function deleted(ProjectTask $projectTask): void
     {
-        $projectTask->saveActivity('deleted_task');
+        // $projectTask->saveActivity('deleted_task');
     }
 
     /**

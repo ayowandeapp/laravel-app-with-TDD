@@ -19,7 +19,15 @@ class ActivityFeedTest extends TestCase
 
         $this->assertCount(1, $project->activity);
 
-        $this->assertEquals('created', $project->activity()->first()->description);
+        // $this->assertEquals('created', $project->activity()->first()->description);
+
+        tap($project->activity->last(), function ($activity) {
+
+            $this->assertEquals('created_project', $activity->description);
+
+            $this->assertNull($activity->changes);
+        });
+
     }
     public function test_update_a_project_generate_activity()
     {
@@ -33,7 +41,7 @@ class ActivityFeedTest extends TestCase
 
         tap($project->activity->last(), function ($activity) use ($oldTitle) {
 
-            $this->assertEquals('updated', $activity->description);
+            $this->assertEquals('updated_project', $activity->description);
             $expected = [
                 'before' => [
                     'title' => $oldTitle,
@@ -61,7 +69,7 @@ class ActivityFeedTest extends TestCase
         $this->assertCount(2, $project->activity);
 
         tap($project->activity->last(), function ($activity) {
-            $this->assertEquals('created_task', $activity->description);
+            $this->assertEquals('created_projecttask', $activity->description);
             $this->assertInstanceOf(ProjectTask::class, $activity->subject);
         });
     }
@@ -74,7 +82,7 @@ class ActivityFeedTest extends TestCase
 
         $this->assertCount(3, $project->activity);
 
-        $this->assertEquals('completed_task', $project->activity->last()->description);
+        $this->assertEquals('completed_projecttask', $project->activity->last()->description);
     }
 
     public function test_delete_a_task_generate_activity()
@@ -85,6 +93,6 @@ class ActivityFeedTest extends TestCase
 
         $this->assertCount(3, $project->activity);
 
-        $this->assertEquals('deleted_task', $project->activity->last()->description);
+        $this->assertEquals('deleted_projecttask', $project->activity->last()->description);
     }
 }

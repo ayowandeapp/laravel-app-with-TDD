@@ -11,7 +11,7 @@ class ProjectObserver
      */
     public function created(Project $project): void
     {
-        $project->saveActivity('created');
+        // $project->saveActivity('created');
     }
 
     /**
@@ -19,13 +19,13 @@ class ProjectObserver
      */
     public function updated(Project $project): void
     {
-        $project->saveActivity('updated');
+        // $project->saveActivity('updated');
     }
 
-    public function updating(Project $project): void
-    {
-        $project->old = $project->getOriginal();
-    }
+    // public function updating(Project $project): void
+    // {
+    //     $project->old = $project->getOriginal();
+    // }
     /**
      * Handle the Project "deleted" event.
      */
