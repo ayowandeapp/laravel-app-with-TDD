@@ -30,6 +30,37 @@ class ProjectsTest extends TestCase
 
     }
 
+    public function test_a_user_can_delete_project()
+    {
+        $project = ProjectFactory::create();
+
+        $res = $this->actingAs($project->owner)->delete($project->path())->assertStatus(Response::HTTP_NO_CONTENT)
+        ;
+        $this->assertDatabaseMissing(Project::class, $project->toArray());
+    }
+
+    public function test_a_guest_cannot_delete_project()
+    {
+        $project = ProjectFactory::create();
+
+        $res = $this->delete($project->path())
+            ->assertStatus(Response::HTTP_FOUND)
+        ;
+
+        $user = $this->authenticate();
+
+        $this->delete($project->path())
+            ->assertStatus(Response::HTTP_FOUND)
+        ;
+        $this->assertDatabaseCount(Project::class, 1);
+
+        $project->invite($user);
+        $this->actingAs($user)->delete($project->path())
+            ->assertStatus(Response::HTTP_FOUND)
+        ;
+
+    }
+
     public function test_a_user_can_update_a_project(): void
     {
         $project = ProjectFactory::create();
@@ -112,6 +143,18 @@ class ProjectsTest extends TestCase
         $response = $this->get($project->path());
 
         $response->assertStatus(Response::HTTP_FORBIDDEN);
+    }
+
+    function test_user_can_see_all_projects_they_were_invited_to()
+    {
+        $this->withoutExceptionHandling();
+        $project = ProjectFactory::create();
+
+        $project->invite($user = User::factory()->create());
+
+        $this->actingAs($user)->get('/api/projects')->assertStatus(Response::HTTP_OK);
+
+        $this->assertDatabaseCount(Project::class, 1);
 
 
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
+use App\Models\User;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +18,7 @@ class ProjectController extends Controller
      */
     public function index(): Response
     {
-        $projects = auth()->user()->projects;
+        $projects = auth()->user()->accessibleProjects();
         return response($projects, Response::HTTP_OK);
     }
 
@@ -37,6 +38,10 @@ class ProjectController extends Controller
         $attributes = $request->validated();
 
         $project = auth()->user()->projects()->create($attributes);
+
+        if ($request->has('tasks')) {
+            $project->tasks()->createMany($request['tasks']);
+        }
 
         return response($project, Response::HTTP_CREATED);
     }
@@ -79,6 +84,21 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        //
+        // if (auth()->user()->cannot('delete', $project)) {
+        //     abort(302);
+        // }
+        $this->authorize('manage', $project);
+
+        $project->delete();
+
+        return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    private function authorize($type, $project)
+    {
+        if (auth()->user()->cannot($type, $project)) {
+            abort(302);
+        }
+
     }
 }

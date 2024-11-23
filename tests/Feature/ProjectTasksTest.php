@@ -131,4 +131,25 @@ class ProjectTasksTest extends TestCase
         $this->assertDatabaseMissing('project_tasks', $payload);
 
     }
+
+
+    public function test_task_can_be_included_when_creating_project()
+    {
+        $this->withoutExceptionHandling();
+        $this->authenticate();
+
+        $attributes = Project::factory()->raw();
+
+        $attributes['tasks'] = [
+            ['body' => 'Task 1'],
+            ['body' => 'Task 2']
+        ];
+
+        $project = $this->post('/api/projects', $attributes)->assertStatus(201);
+
+        $project = Project::find($project['id']);
+
+        $this->assertCount(2, $project->tasks);
+
+    }
 }

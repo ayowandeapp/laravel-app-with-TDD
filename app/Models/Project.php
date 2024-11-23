@@ -7,6 +7,7 @@ use App\RecordsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
@@ -64,5 +65,16 @@ class Project extends Model
     //         ];
     //     }
     // }
+
+    public function invite(User $user)
+    {
+        return $this->members()->attach($user);
+
+    }
+
+    public function members(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'project_members')->withTimestamps();
+    }
 
 }

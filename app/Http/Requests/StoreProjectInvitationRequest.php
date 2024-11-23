@@ -4,16 +4,16 @@ namespace App\Http\Requests;
 
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class StoreProjectTaskRequest extends FormRequest
+class StoreProjectInvitationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return Gate::allows('update', $this->project);
-        // return auth()->user()->id == $this->project->owner_id;
+        return \Gate::allows('manage', $this->project);
     }
 
     /**
@@ -24,7 +24,7 @@ class StoreProjectTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'body' => 'required:min:6'
+            'email' => ['required', Rule::exists('users', 'email')]
         ];
     }
 }

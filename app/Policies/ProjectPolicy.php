@@ -37,7 +37,8 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project): bool
     {
-        return $user->is($project->owner);
+        return $user->is($project->owner) || $project->members->contains($user);
+        // return $user->is($project->owner);
     }
 
     /**
@@ -45,7 +46,7 @@ class ProjectPolicy
      */
     public function delete(User $user, Project $project): bool
     {
-        //
+        return $user->is($project->owner);
     }
 
     /**
@@ -62,5 +63,12 @@ class ProjectPolicy
     public function forceDelete(User $user, Project $project): bool
     {
         //
+    }
+
+
+    public function manage(User $user, Project $project): bool
+    {
+        return $user->is($project->owner);
+
     }
 }
